@@ -9,8 +9,8 @@ import {
   FaExclamationTriangle,
   FaChartLine,
 } from "react-icons/fa";
-import DashboardCard from "@/components/DashboardCard";
-import Topbar from "@/components/Topbar";
+import DashboardCard from "@/components/dashboard/DashboardCard";
+import Topbar from "@/components/layout/Topbar";
 
 export default function Dashboard() {
   const [productCount, setProductCount] = useState(0);
