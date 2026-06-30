@@ -2,88 +2,176 @@
 
 import { useEffect, useState } from "react";
 import { getProducts, Product } from "@/lib/products";
-import { 
-  collection,
-  addDoc,
-  doc,
-  getDoc,
-  updateDoc,
-  serverTimestamp
-} from "firebase/firestore";
-import { db } from "@/lib/firebase";
+
+import ProductPicker from "./ProductPicker";
+import Cart from "./Cart";
+import CartSummary from "./CartSummary";
+
+import { CartItem } from "./types";
+import { checkoutCart } from "./checkout";
 
 export default function SalesPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [selectedId, setSelectedId] = useState("");
   const [quantity, setQuantity] = useState(1);
+  const [cashReceived, setCashReceived] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    async function loadProducts() {
-      const data = await getProducts();
-      setProducts(data);
-    }
-
     loadProducts();
   }, []);
+
+  async function loadProducts() {
+    try {
+      const data = await getProducts();
+      setProducts(data);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to load products.");
+    }
+  }
 
   const selectedProduct = products.find(
     (product) => product.id === selectedId
   );
 
-  const total = selectedProduct
-    ? selectedProduct.price * quantity
-    : 0;
-
-  const recordSale = async () => {
-  if (!selectedProduct?.id) return;
-
-  try {
-    const productRef = doc(db, "products", selectedProduct.id);
-
-    const productSnap = await getDoc(productRef);
-
-    if (!productSnap.exists()) {
-      alert("Product not found");
+  function addToCart() {
+    if (!selectedProduct) {
+      alert("Please select a product.");
       return;
     }
 
-    const productData = productSnap.data();
+    if (quantity <= 0) {
+      alert("Invalid quantity.");
+      return;
+    }
 
-    const currentStock = Number(productData.stock ?? 0);
+    if (quantity > selectedProduct.quantity) {
+      alert("Not enough stock.");
+      return;
+    }
 
-if (quantity > currentStock) {
-  alert("Not enough stock");
-  return;
-}
+    setCart((currentCart) => {
+      const existingItem = currentCart.find(
+        (item) => item.product.id === selectedProduct.id
+      );
 
-    await addDoc(collection(db, "sales"), {
-      productId: selectedProduct.id,
-      productName: selectedProduct.name,
-      quantity,
-      total,
-      createdAt: serverTimestamp()
+      if (existingItem) {
+        return currentCart.map((item) => {
+          if (item.product.id !== selectedProduct.id) {
+            return item;
+          }
+
+          const newQuantity = item.quantity + quantity;
+
+          if (newQuantity > selectedProduct.quantity) {
+            alert("Not enough stock.");
+            return item;
+          }
+
+          return {
+            ...item,
+            quantity: newQuantity,
+          };
+        });
+      }
+
+      return [
+        ...currentCart,
+        {
+          product: selectedProduct,
+          quantity,
+        },
+      ];
     });
-
-
-    await updateDoc(productRef, {
-  stock: currentStock - quantity
-});
-
-
-    alert("Sale recorded!");
 
     setSelectedId("");
     setQuantity(1);
-
-    // refresh stock display
-    const updated = await getProducts();
-    setProducts(updated);
-
-  } catch (error) {
-    console.error(error);
-    alert("Failed to record sale");
   }
-};
+  function increaseQuantity(productId: string) {
+    setCart((currentCart) =>
+      currentCart.map((item) => {
+        if (item.product.id !== productId) {
+          return item;
+        }
+
+        const latestProduct = products.find(
+          (product) => product.id === productId
+        );
+
+        if (!latestProduct) {
+          return item;
+        }
+
+        if (item.quantity >= latestProduct.quantity) {
+          return item;
+        }
+
+        return {
+          ...item,
+          quantity: item.quantity + 1,
+        };
+      })
+    );
+  }
+
+  function decreaseQuantity(productId: string) {
+    setCart((currentCart) =>
+      currentCart
+        .map((item) => {
+          if (item.product.id !== productId) {
+            return item;
+          }
+
+          return {
+            ...item,
+            quantity: item.quantity - 1,
+          };
+        })
+        .filter((item) => item.quantity > 0)
+    );
+  }
+
+  function removeItem(productId: string) {
+    setCart((currentCart) =>
+      currentCart.filter(
+        (item) => item.product.id !== productId
+      )
+    );
+  }
+
+  async function handleCheckout() {
+    if (cart.length === 0) {
+      alert("Your cart is empty.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await checkoutCart(cart);
+
+      alert("Checkout successful!");
+
+      setCart([]);
+      setSelectedId("");
+      setQuantity(1);
+      setCashReceived(0);
+
+      await loadProducts();
+    } catch (error) {
+      console.error(error);
+
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("Checkout failed.");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <main className="p-8">
@@ -91,46 +179,54 @@ if (quantity > currentStock) {
         Sales
       </h1>
 
-      <p className="text-gray-600 mt-2">
-        Record a new sale.
+      <p className="mt-2 text-gray-600">
+        Record sales using the POS system.
       </p>
 
-      <div className="bg-white rounded-xl shadow p-6 mt-8 max-w-md space-y-4">
-
-        <select
-          className="w-full border rounded-lg p-3 text-black"
-          value={selectedId}
-          onChange={(e) => setSelectedId(e.target.value)}
-        >
-          <option value="">Select Product</option>
-
-          {products.map((product) => (
-            <option key={product.id} value={product.id}>
-              {product.name} - ₱{product.price}
-            </option>
-          ))}
-        </select>
-
-        <input
-          type="number"
-          min="1"
-          value={quantity}
-          onChange={(e) => setQuantity(Number(e.target.value))}
-          className="w-full border rounded-lg p-3 text-black"
-        />
-
-        <div className="text-xl font-semibold text-gray-900">
-          Total: ₱{total}
+      <div className="mt-8 grid gap-6 lg:grid-cols-3">
+        <div className="space-y-6">
+          <ProductPicker
+            products={products}
+            selectedId={selectedId}
+            quantity={quantity}
+            onSelect={setSelectedId}
+            onQuantityChange={setQuantity}
+            onAddToCart={addToCart}
+          />
+          <CartSummary
+            items={cart}
+            cashReceived={cashReceived}
+            onCashChange={setCashReceived}
+            loading={loading}
+            onCheckout={handleCheckout}
+          />
         </div>
 
-        <button
-          onClick={recordSale}
-          className="w-full bg-blue-600 text-white rounded-lg p-3 hover:bg-blue-700"
-        >
-          Record Sale
-        </button>
-
+        <div className="lg:col-span-2">
+          <Cart
+            items={cart}
+            onIncrease={increaseQuantity}
+            onDecrease={decreaseQuantity}
+            onRemove={removeItem}
+          />
+        </div>
       </div>
+
+      {products.length === 0 && (
+        <div className="mt-8 rounded-xl bg-yellow-50 border border-yellow-200 p-4">
+          <p className="text-yellow-800">
+            No products found. Add products from the Products page before recording sales.
+          </p>
+        </div>
+      )}
+
+      {cart.length > 0 && (
+        <div className="mt-6 rounded-xl bg-blue-50 border border-blue-200 p-4">
+          <p className="text-blue-800 font-medium">
+            {cart.length} {cart.length === 1 ? "product" : "products"} in cart
+          </p>
+        </div>
+      )}
     </main>
   );
 }
