@@ -1,3 +1,5 @@
+import { Toaster } from "sonner";
+
 import Sidebar from "@/components/layout/Sidebar";
 
 export default function AppLayout({
@@ -9,8 +11,15 @@ export default function AppLayout({
     <div className="flex">
       <Sidebar />
 
-      <main className="flex-1 bg-gray-100 min-h-screen">
+      <main className="flex-1 min-h-screen bg-gray-100">
         {children}
+
+        <Toaster
+          position="top-right"
+          richColors
+          closeButton
+          expand
+        />
       </main>
     </div>
   );

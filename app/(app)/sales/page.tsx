@@ -9,6 +9,12 @@ import CartSummary from "./CartSummary";
 
 import { CartItem } from "./types";
 import { checkoutCart } from "./checkout";
+import { notify } from "@/lib/notify";
+import { formatPeso } from "./currency";
+import { getGrandTotal, getChange } from "./totals";
+import { ReceiptDialog } from "./receipt/ReceiptDialog";
+import { ReceiptData } from "./receipt/types";
+import { mapCheckoutToReceipt } from "./receipt/mapper";
 
 export default function SalesPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -17,6 +23,10 @@ export default function SalesPage() {
   const [quantity, setQuantity] = useState(1);
   const [cashReceived, setCashReceived] = useState(0);
   const [loading, setLoading] = useState(false);
+  const grandTotal = getGrandTotal(cart);
+  const [receiptOpen, setReceiptOpen] = useState(false);
+  const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
+  
 
   useEffect(() => {
     loadProducts();
@@ -28,7 +38,7 @@ export default function SalesPage() {
       setProducts(data);
     } catch (error) {
       console.error(error);
-      alert("Failed to load products.");
+      notify.error("Failed to load products.");
     }
   }
 
@@ -38,17 +48,17 @@ export default function SalesPage() {
 
   function addToCart() {
     if (!selectedProduct) {
-      alert("Please select a product.");
+      notify.warning("Please select a product.");
       return;
     }
 
     if (quantity <= 0) {
-      alert("Invalid quantity.");
+      notify.warning("Invalid quantity.");
       return;
     }
 
     if (quantity > selectedProduct.quantity) {
-      alert("Not enough stock.");
+      notify.error("Not enough stock.");
       return;
     }
 
@@ -66,7 +76,7 @@ export default function SalesPage() {
           const newQuantity = item.quantity + quantity;
 
           if (newQuantity > selectedProduct.quantity) {
-            alert("Not enough stock.");
+            notify.error("Not enough stock.");
             return item;
           }
 
@@ -142,31 +152,36 @@ export default function SalesPage() {
   }
 
   async function handleCheckout() {
-    if (cart.length === 0) {
-      alert("Your cart is empty.");
-      return;
-    }
-
     try {
-      setLoading(true);
+  setLoading(true);
 
-      await checkoutCart(cart);
+  const result = await checkoutCart(
+    cart,
+    cashReceived
+  );
 
-      alert("Checkout successful!");
+  const receipt = mapCheckoutToReceipt(result);
 
+  setReceiptData(receipt);
+  setReceiptOpen(true);
+
+  notify.success(
+    `Sale completed! Change: ${formatPeso(result.change)}`
+  );
       setCart([]);
       setSelectedId("");
       setQuantity(1);
       setCashReceived(0);
+      
 
       await loadProducts();
     } catch (error) {
       console.error(error);
 
       if (error instanceof Error) {
-        alert(error.message);
+        notify.error(error.message);
       } else {
-        alert("Checkout failed.");
+        notify.error("Checkout failed.");
       }
     } finally {
       setLoading(false);
@@ -209,6 +224,7 @@ export default function SalesPage() {
             onDecrease={decreaseQuantity}
             onRemove={removeItem}
           />
+          
         </div>
       </div>
 
@@ -227,6 +243,12 @@ export default function SalesPage() {
           </p>
         </div>
       )}
+      <ReceiptDialog
+  open={receiptOpen}
+  receipt={receiptData}
+  onClose={() => setReceiptOpen(false)}
+  onPrint={() => {}}
+/>
     </main>
   );
 }
