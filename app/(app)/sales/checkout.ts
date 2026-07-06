@@ -72,13 +72,13 @@ export async function checkoutCart(
     for (const product of productSnapshots) {
       const data = product.snapshot.data();
 
-if (!data) {
-  throw new Error(
-    `${product.item.product.name} no longer exists.`
-  );
-}
+      if (!data) {
+        throw new Error(
+          `${product.item.product.name} no longer exists.`
+        );
+      }
 
-const currentQuantity = Number(data.quantity ?? 0);
+      const currentQuantity = Number(data.quantity ?? 0);
 
       transaction.update(product.productRef, {
         quantity:
@@ -107,11 +107,11 @@ const currentQuantity = Number(data.quantity ?? 0);
     });
   });
   return {
-  saleId: saleRef.id,
-  createdAt: new Date(),
-  total: grandTotal,
-  cashReceived,
-  change,
-  items,
-};
+    saleId: saleRef.id,
+    createdAt: new Date(),
+    total: grandTotal,
+    cashReceived,
+    change,
+    items,
+  };
 }

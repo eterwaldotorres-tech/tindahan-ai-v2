@@ -44,11 +44,11 @@ export default function CartSummary({
     cashReceived >= grandTotal &&
     !loading;
 
-    <QuickCashButtons
-  total={grandTotal}
-  onSelect={(amount) => onCashChange(amount)}
-  
-/>
+  <QuickCashButtons
+    total={grandTotal}
+    onSelect={(amount) => onCashChange(amount)}
+
+  />
 
   return (
     <div className="bg-white rounded-xl shadow p-6 space-y-5">
@@ -79,17 +79,17 @@ export default function CartSummary({
           min={0}
           value={cashReceived || ""}
           onChange={(e) =>
-          onCashChange(Number(e.target.value))
+            onCashChange(Number(e.target.value))
           }
           onKeyDown={(e) => {
-             if (e.key === "Enter" && canCheckout) {
-             e.preventDefault();
+            if (e.key === "Enter" && canCheckout) {
+              e.preventDefault();
               onCheckout();
-        }
-        }}
-         className="w-full rounded-lg border p-3 text-black"
-        placeholder="Enter cash amount"
-          />
+            }
+          }}
+          className="w-full rounded-lg border p-3 text-black"
+          placeholder="Enter cash amount"
+        />
       </div>
 
       <div className="rounded-lg bg-gray-100 p-4">
@@ -99,11 +99,10 @@ export default function CartSummary({
           </span>
 
           <span
-            className={`font-bold text-xl ${
-              change >= 0
+            className={`font-bold text-xl ${change >= 0
                 ? "text-green-600"
                 : "text-red-600"
-            }`}
+              }`}
           >
             {formatPeso(Math.abs(change))}
           </span>

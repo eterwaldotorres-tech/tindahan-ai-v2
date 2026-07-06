@@ -9,6 +9,7 @@ import {
   FaChartBar,
   FaRobot,
   FaCog,
+  FaHistory,
 } from "react-icons/fa";
 
 const links = [
@@ -26,6 +27,11 @@ const links = [
     href: "/sales",
     label: "Sales",
     icon: FaCashRegister,
+  },
+  {
+    href: "/sales-history",
+    label: "Sales History",
+    icon: FaHistory,
   },
   {
     href: "/reports",
@@ -72,11 +78,10 @@ export default function Sidebar() {
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center gap-4 rounded-xl px-5 py-4 transition-all duration-200 ${
-                active
+              className={`flex items-center gap-4 rounded-xl px-5 py-4 transition-all duration-200 ${active
                   ? "bg-blue-600 shadow-lg"
                   : "hover:bg-slate-800"
-              }`}
+                }`}
             >
               <Icon className="text-xl" />
 

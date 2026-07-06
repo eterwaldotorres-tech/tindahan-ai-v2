@@ -29,80 +29,80 @@ export default function InventoryPage() {
     loadProducts();
   }, []);
 
-async function handleAddProduct() {
-  if (!name || !price || !quantity) {
-    alert("Please fill in all fields.");
-    return;
+  async function handleAddProduct() {
+    if (!name || !price || !quantity) {
+      alert("Please fill in all fields.");
+      return;
+    }
+
+    // EDIT MODE
+    if (editingProduct) {
+      await updateProduct({
+        id: editingProduct.id,
+        name,
+        price: Number(price),
+        quantity: Number(quantity),
+      });
+
+      alert("✅ Product updated!");
+
+      setEditingProduct(null);
+    } else {
+      // ADD MODE
+      await addProduct({
+        name,
+        price: Number(price),
+        quantity: Number(quantity),
+      });
+
+      alert("✅ Product added!");
+    }
+
+    await loadProducts();
+
+    setName("");
+    setPrice("");
+    setQuantity("");
   }
 
-  // EDIT MODE
-  if (editingProduct) {
-    await updateProduct({
-      id: editingProduct.id,
-      name,
-      price: Number(price),
-      quantity: Number(quantity),
+  async function handleDelete(product: Product) {
+    if (!product.id) return;
+
+    const confirmed = window.confirm(
+      `Delete "${product.name}"?\n\nThis cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    await deleteProduct(product.id);
+
+    await loadProducts();
+  }
+
+  function handleEdit(product: Product) {
+    setEditingProduct(product);
+
+    setName(product.name);
+    setPrice(product.price.toString());
+    setQuantity(product.quantity.toString());
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
     });
+  }
 
-    alert("✅ Product updated!");
-
+  function cancelEdit() {
     setEditingProduct(null);
-  } else {
-    // ADD MODE
-    await addProduct({
-      name,
-      price: Number(price),
-      quantity: Number(quantity),
-    });
 
-    alert("✅ Product added!");
+    setName("");
+    setPrice("");
+    setQuantity("");
   }
 
-  await loadProducts();
-
-  setName("");
-  setPrice("");
-  setQuantity("");
-}
-
-async function handleDelete(product: Product) {
-  if (!product.id) return;
-
-  const confirmed = window.confirm(
-    `Delete "${product.name}"?\n\nThis cannot be undone.`
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(search.toLowerCase())
   );
-
-  if (!confirmed) return;
-
-  await deleteProduct(product.id);
-
-  await loadProducts();
-}
-
-function handleEdit(product: Product) {
-  setEditingProduct(product);
-
-  setName(product.name);
-  setPrice(product.price.toString());
-  setQuantity(product.quantity.toString());
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth",
-  });
-}
-
-function cancelEdit() {
-  setEditingProduct(null);
-
-  setName("");
-  setPrice("");
-  setQuantity("");
-}
-
-const filteredProducts = products.filter((product) =>
-  product.name.toLowerCase().includes(search.toLowerCase())
-);
 
   return (
     <main className="min-h-screen bg-gray-100 p-8">
@@ -115,15 +115,15 @@ const filteredProducts = products.filter((product) =>
       </p>
 
       {editingProduct && (
-  <div className="mt-4 rounded-lg bg-blue-100 border border-blue-300 p-4 text-blue-800">
-    Editing: <strong>{editingProduct.name}</strong>
-  </div>
-)}
+        <div className="mt-4 rounded-lg bg-blue-100 border border-blue-300 p-4 text-blue-800">
+          Editing: <strong>{editingProduct.name}</strong>
+        </div>
+      )}
 
       <div className="bg-white rounded-xl shadow-md p-6 mt-8">
         <h2 className="text-2xl font-semibold text-slate-800 mb-6">
-  {editingProduct ? "Edit Product" : "Add New Product"}
-</h2>
+          {editingProduct ? "Edit Product" : "Add New Product"}
+        </h2>
 
         <div className="grid gap-4 md:grid-cols-3">
           <input
@@ -153,23 +153,23 @@ const filteredProducts = products.filter((product) =>
 
         <div className="mt-6 flex gap-3">
 
-  <button
-    onClick={handleAddProduct}
-    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition"
-  >
-    {editingProduct ? "Update Product" : "Add Product"}
-  </button>
+          <button
+            onClick={handleAddProduct}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition"
+          >
+            {editingProduct ? "Update Product" : "Add Product"}
+          </button>
 
-  {editingProduct && (
-    <button
-      onClick={cancelEdit}
-      className="bg-gray-300 hover:bg-gray-400 px-6 py-3 rounded-lg transition"
-    >
-      Cancel
-    </button>
-  )}
+          {editingProduct && (
+            <button
+              onClick={cancelEdit}
+              className="bg-gray-300 hover:bg-gray-400 px-6 py-3 rounded-lg transition"
+            >
+              Cancel
+            </button>
+          )}
 
-</div>
+        </div>
       </div>
 
       {/* Products */}
@@ -273,15 +273,15 @@ const filteredProducts = products.filter((product) =>
                         <div className="flex justify-center gap-3">
 
                           <button
-  onClick={() => handleEdit(product)}
-  className="text-blue-600 hover:text-blue-800 transition"
-  title="Edit"
->
-  <FaEdit />
-</button>
+                            onClick={() => handleEdit(product)}
+                            className="text-blue-600 hover:text-blue-800 transition"
+                            title="Edit"
+                          >
+                            <FaEdit />
+                          </button>
 
                           <button
-                          onClick={() => handleDelete(product)}
+                            onClick={() => handleDelete(product)}
                             className="text-red-600 hover:text-red-800"
                             title="Delete"
                           >

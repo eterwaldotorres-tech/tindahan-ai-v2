@@ -12,7 +12,7 @@ export default function QuickCashButtons({
   total,
   onSelect,
 }: QuickCashButtonsProps) {
-    const suggestions = getSuggestedCashAmounts(total);
+  const suggestions = getSuggestedCashAmounts(total);
   return (
     <div className="space-y-2">
       <p className="text-sm font-medium text-gray-700">
@@ -21,15 +21,15 @@ export default function QuickCashButtons({
 
       <div className="grid grid-cols-4 gap-2">
         {suggestions.map((amount) => (
-  <button
-    key={amount}
-    type="button"
-    onClick={() => onSelect(amount)}
-    className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 active:scale-95"
-  >
-    {formatPeso(amount)}
-  </button>
-))}
+          <button
+            key={amount}
+            type="button"
+            onClick={() => onSelect(amount)}
+            className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 active:scale-95"
+          >
+            {formatPeso(amount)}
+          </button>
+        ))}
 
         <button
           type="button"

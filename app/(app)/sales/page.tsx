@@ -26,7 +26,7 @@ export default function SalesPage() {
   const grandTotal = getGrandTotal(cart);
   const [receiptOpen, setReceiptOpen] = useState(false);
   const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
-  
+
 
   useEffect(() => {
     loadProducts();
@@ -153,26 +153,26 @@ export default function SalesPage() {
 
   async function handleCheckout() {
     try {
-  setLoading(true);
+      setLoading(true);
 
-  const result = await checkoutCart(
-    cart,
-    cashReceived
-  );
+      const result = await checkoutCart(
+        cart,
+        cashReceived
+      );
 
-  const receipt = mapCheckoutToReceipt(result);
+      const receipt = mapCheckoutToReceipt(result);
 
-  setReceiptData(receipt);
-  setReceiptOpen(true);
+      setReceiptData(receipt);
+      setReceiptOpen(true);
 
-  notify.success(
-    `Sale completed! Change: ${formatPeso(result.change)}`
-  );
+      notify.success(
+        `Sale completed! Change: ${formatPeso(result.change)}`
+      );
       setCart([]);
       setSelectedId("");
       setQuantity(1);
       setCashReceived(0);
-      
+
 
       await loadProducts();
     } catch (error) {
@@ -224,7 +224,7 @@ export default function SalesPage() {
             onDecrease={decreaseQuantity}
             onRemove={removeItem}
           />
-          
+
         </div>
       </div>
 
@@ -244,11 +244,11 @@ export default function SalesPage() {
         </div>
       )}
       <ReceiptDialog
-  open={receiptOpen}
-  receipt={receiptData}
-  onClose={() => setReceiptOpen(false)}
-  onPrint={() => {}}
-/>
+        open={receiptOpen}
+        receipt={receiptData}
+        onClose={() => setReceiptOpen(false)}
+        onPrint={() => { }}
+      />
     </main>
   );
 }
