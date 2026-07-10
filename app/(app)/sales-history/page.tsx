@@ -6,6 +6,7 @@ import type { SaleDocument } from "./types";
 import SalesTable from "./SalesTable";
 import { mapSaleToReceiptData } from "../sales/receipt/saleMapper";
 import { ReceiptDialog } from "../sales/receipt/ReceiptDialog";
+import Topbar from "@/components/layout/Topbar";
 
 export default function SalesHistoryPage() {
   const [sales, setSales] = useState<SaleDocument[]>([]);
@@ -39,18 +40,19 @@ export default function SalesHistoryPage() {
 
   return (
     <>
-      <div>
-        ...
-        <SalesTable
-          sales={sales}
-          onViewReceipt={setSelectedSale}
-        />
-      </div>
+      <Topbar
+        title="Sales History"
+        subtitle="Review completed transactions."
+      />
+      <SalesTable
+        sales={sales}
+        onViewReceipt={handleViewReceipt}
+      />
 
       <ReceiptDialog
-        open={selectedSale !== null}
+        open={receiptOpen}
         receipt={receiptData}
-        onClose={() => setSelectedSale(null)}
+        onClose={() => setReceiptOpen(false)}
         onPrint={() => window.print()}
       />
     </>

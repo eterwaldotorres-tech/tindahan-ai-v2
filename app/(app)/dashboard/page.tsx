@@ -52,9 +52,12 @@ export default function Dashboard() {
   return (
     <div className="flex-1 flex flex-col">
 
-      <Topbar title="Dashboard" />
+      <main className="p-8 space-y-8">
 
-      <main className="p-10">
+        <Topbar
+          title="Dashboard"
+          subtitle="Welcome back. Here's an overview of your store."
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
 

@@ -1,4 +1,207 @@
 # Changelog
+# Tindahan AI Changelog
+
+## Reports Module — Sales Trend Chart
+
+### Overview
+
+This development session focused on completing the first interactive analytics visualization for the Reports module.
+
+The existing reporting pipeline was already verified:
+
+Firestore
+↓
+queries.ts
+↓
+ReportsPage
+↓
+filterSalesByDateRange()
+├── calculateReportSummary()
+└── getSalesTrendData()
+↓
+SalesTrendChart
+
+The objective was to replace the temporary JSON output with a production-quality Recharts visualization while preserving the existing architecture.
+
+---
+
+## Added
+
+### Recharts
+
+Installed Recharts for analytics visualizations.
+
+```bash
+npm install recharts
+```
+
+---
+
+### SalesTrendChart
+
+Replaced the temporary JSON output with a responsive line chart.
+
+Implemented:
+
+- ResponsiveContainer
+- LineChart
+- CartesianGrid
+- XAxis
+- YAxis
+- Tooltip
+- Line
+
+The chart consumes:
+
+```ts
+SalesTrendPoint[]
+```
+
+making it a purely presentational component.
+
+No business logic or Firestore access was introduced into the chart.
+
+---
+
+### Currency Formatting
+
+Added currency formatting using:
+
+```ts
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    maximumFractionDigits: 0,
+  }).format(value);
+```
+
+Applied to:
+
+- Y-axis labels
+- Tooltip values
+
+This improves readability and aligns analytics with how store owners naturally interpret sales data.
+
+---
+
+### Chart Polish
+
+Improved the visual quality of the chart by adding:
+
+- Custom chart margins
+- Softer grid styling
+- Horizontal grid emphasis
+- Active hover dot
+- Smooth line animation
+
+These changes improved readability without affecting the reporting pipeline.
+
+---
+
+## Architecture
+
+The Reports architecture remains unchanged.
+
+Firestore
+↓
+queries.ts
+↓
+ReportsPage
+↓
+filterSalesByDateRange()
+├── calculateReportSummary()
+└── getSalesTrendData()
+↓
+SalesTrendChart
+
+Responsibilities remain clearly separated:
+
+- Firestore access → queries.ts
+- Business calculations → calculations.ts
+- UI rendering → SalesTrendChart
+- Page orchestration → ReportsPage
+
+---
+
+## Design System
+
+Continued establishing the Tindahan AI analytics design language.
+
+Current standards:
+
+- rounded-2xl
+- border-gray-200
+- shadow-sm
+- subtle hover interactions
+- responsive layouts
+- blue primary accent
+- consistent typography
+- clean KPI cards
+- modern analytics presentation
+
+---
+
+## Progress Made
+
+Completed:
+
+- Verified the full reporting data pipeline.
+- Installed Recharts.
+- Replaced temporary JSON output with a responsive line chart.
+- Added currency formatting using `Intl.NumberFormat`.
+- Improved chart spacing with custom margins.
+- Softened the chart grid for better readability.
+- Added active hover dots.
+- Added smooth line animation.
+- Confirmed responsive behavior across the Reports page.
+
+The Reports page now contains Tindahan AI's first interactive analytics visualization.
+
+---
+
+## Next Steps
+
+Planned improvements:
+
+- Build a reusable custom chart tooltip.
+- Create shared chart formatting utilities.
+- Add an empty chart state.
+- Weekly trend aggregation.
+- Monthly trend aggregation.
+- Top Selling Products analytics.
+- Sales by Day analytics.
+- Inventory insights.
+- AI-powered business insights.
+
+## Sales History Receipt Viewer
+
+### Added
+
+- Added reusable receipt viewing from the Sales History module.
+- Introduced `receipt/saleMapper.ts` to map `SaleDocument` into the shared `ReceiptData` model.
+- Added "View Receipt" action to Sales History.
+- Reused the existing `ReceiptDialog` and `Receipt` components for displaying historical receipts.
+
+### Architecture
+
+- Preserved separation between Checkout and Sales History.
+- Kept the existing `receipt/mapper.ts` unchanged.
+- Introduced a dedicated mapper for the Sales domain instead of expanding the Checkout mapper.
+- Maintained `ReceiptData` as the shared presentation model for receipt rendering.
+
+### Design Decisions
+
+- Did **not** reuse `getTotalItems()` because it belongs to the Cart domain.
+- Calculated `totalItems` inside `saleMapper.ts` using `Array.reduce()`, keeping Sales History independent from Checkout and Cart logic.
+- Kept React components focused on rendering while placing transformation logic in reusable modules.
+
+### Benefits
+
+- Receipt UI can now be reused by multiple domains.
+- Checkout and Sales History remain loosely coupled.
+- Additional domains (Refunds, Returns, Archived Sales, etc.) can reuse the receipt system by providing their own mapper to `ReceiptData`.
+# Changelog
 
 
 ## Session: Receipt Preview Architecture

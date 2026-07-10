@@ -9,6 +9,7 @@ import {
   updateProduct,
   Product,
 } from "@/lib/products";
+import Topbar from "@/components/layout/Topbar";
 
 export default function InventoryPage() {
   const [name, setName] = useState("");
@@ -106,13 +107,11 @@ export default function InventoryPage() {
 
   return (
     <main className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-4xl font-bold text-slate-800">
-        Inventory
-      </h1>
 
-      <p className="text-slate-500 mt-2">
-        Manage your store products
-      </p>
+      <Topbar
+        title="Inventory"
+        subtitle="Track stock levels and inventory status."
+      />
 
       {editingProduct && (
         <div className="mt-4 rounded-lg bg-blue-100 border border-blue-300 p-4 text-blue-800">

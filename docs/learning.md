@@ -246,3 +246,186 @@ Small, complete steps are easier to test, review, and debug than large rewrites.
 A good architecture is not about having more files.
 
 It is about giving each file a single responsibility and allowing features to be reused without duplication.
+# Learning Notes
+
+## Feature
+
+Reusable Receipt Viewer for Sales History
+
+---
+
+## Goal
+
+Allow historical sales to be displayed using the same receipt UI that is already used after Checkout.
+
+Instead of creating another receipt component, reuse the existing presentation layer.
+
+---
+
+## Existing Receipt Architecture
+
+```
+CheckoutResult
+      │
+      ▼
+mapper.ts
+      │
+      ▼
+ReceiptData
+      │
+      ▼
+ReceiptDialog
+      │
+      ▼
+Receipt
+```
+
+The receipt components are intentionally presentation-only.
+
+They render a `ReceiptData` object and have no knowledge of Checkout.
+
+---
+
+## Problem
+
+Sales History stores data as `SaleDocument`.
+
+```
+SaleDocument
+```
+
+This is a completely different model from `CheckoutResult`.
+
+Trying to extend the existing mapper would couple two unrelated domains.
+
+---
+
+## Solution
+
+Create a second mapper.
+
+```
+SaleDocument
+      │
+      ▼
+saleMapper.ts
+      │
+      ▼
+ReceiptData
+      │
+      ▼
+ReceiptDialog
+```
+
+Each domain owns its own mapping into the shared presentation model.
+
+---
+
+## Why Not Modify `mapper.ts`?
+
+`mapper.ts` belongs to the Checkout domain.
+
+It should only know how Checkout data becomes a receipt.
+
+Adding Sales History logic would violate the Single Responsibility Principle and introduce unnecessary coupling.
+
+Instead:
+
+- Checkout → `mapper.ts`
+- Sales History → `saleMapper.ts`
+
+Both produce the same output model.
+
+---
+
+## Why Not Reuse `getTotalItems()`?
+
+`getTotalItems()` belongs to the Cart domain.
+
+Although the calculation is identical, importing it into Sales History would create an unnecessary dependency.
+
+Instead:
+
+```ts
+const totalItems = sale.items.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+);
+```
+
+This keeps the Sales domain self-contained.
+
+---
+
+## Separation of Concerns
+
+UI Components
+
+- Receipt
+- ReceiptDialog
+
+Responsibilities
+
+- Rendering
+- Layout
+- Printing
+
+Business Logic
+
+- mapper.ts
+- saleMapper.ts
+
+Responsibilities
+
+- Data transformation
+- Mapping domain models
+- Computing derived values
+
+This keeps React components simple and easy to maintain.
+
+---
+
+## Final Architecture
+
+```
+Checkout
+    │
+    ▼
+CheckoutResult
+    │
+mapper.ts
+    │
+    ▼
+ReceiptData
+    │
+    ▼
+Receipt UI
+```
+
+```
+Sales History
+     │
+     ▼
+SaleDocument
+     │
+saleMapper.ts
+     │
+     ▼
+ReceiptData
+     │
+     ▼
+Receipt UI
+```
+
+The receipt components remain completely reusable because they only depend on `ReceiptData`.
+
+---
+
+## Lessons Learned
+
+- A shared UI does not require a shared domain model.
+- Mapping is an effective boundary between domains.
+- Keep transformation logic outside React components.
+- Avoid sharing utilities across domains unless they truly represent shared business logic.
+- Duplicate small, domain-specific calculations when it prevents tighter coupling.
+- A stable presentation model (`ReceiptData`) makes UI reuse straightforward while allowing each feature to evolve independently.

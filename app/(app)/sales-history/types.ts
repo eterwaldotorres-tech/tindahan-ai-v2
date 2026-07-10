@@ -1,14 +1,8 @@
-export interface SaleItemDocument {
-  productId: string;
-  productName: string;
-  quantity: number;
-  price: number;
-  total: number;
-}
+import { Timestamp } from "firebase/firestore";
 
 export interface SaleDocument {
   id: string;
-  createdAt?: unknown;
+  createdAt?: Timestamp;
 
   items: SaleItemDocument[];
 
@@ -18,7 +12,13 @@ export interface SaleDocument {
   cashReceived: number;
   change: number;
 }
-
+export interface SaleItemDocument {
+  productId: string;
+  productName: string;
+  quantity: number;
+  price: number;
+  total: number;
+}
 export interface SaleHistoryItem {
   id: string;
   soldAt: Date | null;

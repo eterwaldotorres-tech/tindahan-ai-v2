@@ -14,10 +14,10 @@ export default function DashboardCard({
   iconBg,
 }: DashboardCardProps) {
   return (
-    <div className="bg-white rounded-2xl shadow-md p-8 min-h-[320px] flex flex-col items-center justify-center hover:shadow-lg transition-all duration-300">
+    <div className="bg-white rounded-2xl shadow-md p-8 min-h-[220px] flex flex-col items-center justify-center hover:shadow-lg transition-all duration-300">
 
       <div
-        className={`w-20 h-20 rounded-full flex items-center justify-center mb-5 ${iconBg}`}
+        className={`w-16 h-16 rounded-full flex items-center justify-center mb-5 ${iconBg}`}
       >
         {icon}
       </div>
@@ -26,7 +26,7 @@ export default function DashboardCard({
         {title}
       </p>
 
-      <h2 className="text-5xl font-bold text-slate-900 mt-2">
+      <h2 className="text-4xl font-bold text-slate-900 mt-2">
         {value}
       </h2>
 
