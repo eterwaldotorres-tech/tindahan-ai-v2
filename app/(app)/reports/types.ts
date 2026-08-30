@@ -1,5 +1,3 @@
-import { SaleDocument } from "../sales-history/types";
-
 export type ReportPeriod =
     | "today"
     | "week"
@@ -21,11 +19,25 @@ export interface ReportFilters {
     period: ReportPeriod;
 }
 
-export interface ReportData {
-    sales: SaleDocument[];
-    summary: ReportSummary;
-}
 export interface SalesTrendPoint {
     label: string;
     revenue: number;
+}
+
+export interface TopSellingProduct {
+    productId: string;
+    productName: string;
+    quantitySold: number;
+}
+
+export interface SalesByDayPoint {
+    day: string;
+    revenue: number;
+}
+
+export interface InventoryInsightsData {
+    totalProducts: number;
+    lowStockProducts: number;
+    outOfStockProducts: number;
+    totalInventoryValue: number;
 }

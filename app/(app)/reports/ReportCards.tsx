@@ -1,4 +1,5 @@
 import { ReportSummary } from "./types";
+import { formatPeso } from "../sales/currency";
 
 interface ReportCardsProps {
     summary: ReportSummary;
@@ -10,7 +11,7 @@ export default function ReportCards({
     const cards = [
         {
             title: "Total Revenue",
-            value: `₱${summary.totalRevenue.toFixed(2)}`,
+            value: formatPeso(summary.totalRevenue),
             description: "Revenue for the selected period",
         },
         {

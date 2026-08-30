@@ -429,3 +429,242 @@ The receipt components remain completely reusable because they only depend on `R
 - Avoid sharing utilities across domains unless they truly represent shared business logic.
 - Duplicate small, domain-specific calculations when it prevents tighter coupling.
 - A stable presentation model (`ReceiptData`) makes UI reuse straightforward while allowing each feature to evolve independently.
+
+# Learning Notes — Reports Module (Sales Trend Chart)
+
+## 1. UI components should only display data
+
+SalesTrendChart receives:
+
+```ts
+SalesTrendPoint[]
+```
+
+It never:
+
+- fetches Firestore
+- filters sales
+- calculates revenue
+
+Its only responsibility is rendering the chart.
+
+This keeps business logic independent from presentation.
+
+---
+
+## 2. Good architecture localizes change
+
+Because the reporting architecture was already complete:
+
+Firestore
+↓
+queries.ts
+↓
+ReportsPage
+↓
+calculations.ts
+
+Adding Recharts only required replacing one UI component.
+
+No changes were necessary to:
+
+- Firestore queries
+- Business calculations
+- Report types
+- Report orchestration
+
+This demonstrates the benefit of separating concerns.
+
+---
+
+## 3. Think about component ownership
+
+When adding props, ask:
+
+**"Which component owns this behavior?"**
+
+Examples:
+
+Chart margins
+→ LineChart
+
+Grid styling
+→ CartesianGrid
+
+Axis labels
+→ XAxis
+
+Axis formatting
+→ YAxis
+
+Tooltip behavior
+→ Tooltip
+
+Line styling
+→ Line
+
+Animation
+→ Line
+
+Understanding ownership makes it much easier to learn unfamiliar React libraries.
+
+---
+
+## 4. JSX props belong inside the opening tag
+
+Incorrect:
+
+```tsx
+<LineChart data={data}>
+margin={{ top: 10 }}
+```
+
+Correct:
+
+```tsx
+<LineChart
+  data={data}
+  margin={{
+    top: 10,
+    right: 20,
+    left: 10,
+    bottom: 10,
+  }}
+>
+```
+
+React components receive configuration through props inside the opening tag.
+
+---
+
+## 5. Formatting is presentation
+
+Revenue remains:
+
+```ts
+1000
+```
+
+Formatting changes only what the user sees:
+
+```text
+₱1,000
+```
+
+Business data should never be modified just for display.
+
+---
+
+## 6. Intl.NumberFormat
+
+Using:
+
+```ts
+new Intl.NumberFormat("en-PH", {
+  style: "currency",
+  currency: "PHP",
+})
+```
+
+is preferable to manually concatenating strings.
+
+Benefits:
+
+- locale-aware
+- currency-aware
+- production-ready
+- reusable
+
+Future versions of Tindahan AI can move this into a shared formatter utility.
+
+---
+
+## 7. Component hierarchy
+
+The Recharts component tree:
+
+ResponsiveContainer
+└── LineChart
+    ├── CartesianGrid
+    ├── XAxis
+    ├── YAxis
+    ├── Tooltip
+    └── Line
+
+Thinking in hierarchies is often more useful than memorizing APIs.
+
+---
+
+## 8. UI polish happens incrementally
+
+Professional interfaces are built through many small refinements rather than one large change.
+
+Examples:
+
+- spacing
+- typography
+- grid styling
+- margins
+- animations
+- hover interactions
+- formatting
+
+Small improvements accumulate into a polished user experience.
+
+---
+
+## 9. Delay abstractions until they are earned
+
+Potential future modules:
+
+```text
+reports/
+├── SalesTrendChart.tsx
+├── ChartTooltip.tsx
+├── chartFormatters.ts
+└── types.ts
+```
+
+These abstractions are intentionally postponed until multiple charts need them.
+
+Avoiding premature abstraction keeps the project easier to understand while it grows.
+
+---
+
+## 10. Data Pipeline
+
+Current Reports architecture:
+
+Firestore
+↓
+queries.ts
+↓
+ReportsPage
+↓
+filterSalesByDateRange()
+├── calculateReportSummary()
+└── getSalesTrendData()
+↓
+SalesTrendChart
+↓
+User
+
+Each layer has one responsibility:
+
+- Firestore stores data.
+- queries.ts retrieves data.
+- calculations.ts transforms data.
+- ReportsPage orchestrates data flow.
+- SalesTrendChart visualizes data.
+
+---
+
+## Key Takeaway
+
+This session marked one of the biggest milestones in Tindahan AI's development.
+
+For the first time, the application transformed raw sales data into an interactive analytics visualization.
+
+More importantly, this milestone validated that the architecture built over previous modules is working as intended. Because responsibilities are clearly separated, new analytics features can be introduced by modifying only the presentation layer.
+
+The project is no longer just a Point of Sale application—it is steadily evolving into a business intelligence platform capable of helping store owners understand, not just record, their business.

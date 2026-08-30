@@ -8,6 +8,10 @@ import {
 import { db } from "@/lib/firebase";
 
 import { SaleDocument } from "../sales-history/types";
+import {
+    getProducts,
+    Product,
+} from "@/lib/products";
 
 export async function getReportSales(): Promise<SaleDocument[]> {
     const salesQuery = query(
@@ -21,4 +25,8 @@ export async function getReportSales(): Promise<SaleDocument[]> {
         id: doc.id,
         ...(doc.data() as Omit<SaleDocument, "id">),
     }));
+}
+
+export function getReportProducts(): Promise<Product[]> {
+    return getProducts();
 }
