@@ -1,4 +1,197 @@
 # Changelog
+# Changelog
+
+All notable changes to Tindahan AI are documented in this file.
+
+---
+
+## [Unreleased]
+
+### Added
+
+- Improved Dashboard loading and error handling.
+- Added retry functionality when Dashboard data fails to load.
+- Added Dashboard skeleton loading UI.
+- Added Recent Sales section to the Dashboard.
+- Added receipt viewing from recent Dashboard sales.
+- Improved Sales History UI and functionality.
+- Added loading states to Inventory.
+- Added error handling and retry functionality to Inventory.
+- Added saving states when adding or updating products.
+- Added deleting states when removing products.
+- Added improved empty states for Inventory search and product lists.
+- Added accessible labels to Inventory search and action buttons.
+- Added reusable ProductForm component.
+- Added reusable ProductTable component.
+
+### Changed
+
+- Refactored Dashboard Firestore access into dedicated query functions.
+- Refactored Dashboard calculations into reusable calculation utilities.
+- Improved Dashboard component separation and maintainability.
+- Improved Sales History integration with the reusable receipt system.
+- Improved Inventory page architecture.
+- Moved Inventory form UI into ProductForm.tsx.
+- Moved Inventory table and search UI into ProductTable.tsx.
+- Reused StockStatus.tsx inside ProductTable instead of duplicating stock status logic.
+- Improved Inventory form labels and input accessibility.
+- Improved button disabled states during save and delete operations.
+
+### Refactored
+
+#### Dashboard
+
+Dashboard responsibilities are now separated into:
+
+- `page.tsx` — state management and orchestration.
+- `queries.ts` — Firestore data access.
+- `calculations.ts` — Dashboard business calculations.
+- `DashboardSkeleton.tsx` — loading UI.
+- `RecentSales.tsx` — recent transaction display.
+
+#### Inventory
+
+Inventory responsibilities are now separated into:
+
+- `page.tsx` — state management and CRUD orchestration.
+- `ProductForm.tsx` — product add/edit form UI.
+- `ProductTable.tsx` — product table and search UI.
+- `StockStatus.tsx` — reusable inventory status display.
+- `queries.ts` — Firestore access.
+- `calculations.ts` — inventory business logic.
+
+### Fixed
+
+- Prevented duplicate Inventory form rendering during component extraction.
+- Preserved stock status functionality while refactoring ProductTable.
+- Preserved delete loading state after extracting ProductTable.
+- Improved text visibility and contrast across Inventory UI components.
+- Improved error recovery with retry buttons.
+
+---
+
+## Previous Features
+
+### Reports Module
+
+Completed reporting foundation including:
+
+- Report period selector.
+- Revenue summary cards.
+- Transaction count.
+- Items sold.
+- Average transaction value.
+- Sales trend chart using Recharts.
+- Custom chart tooltip.
+- Top selling products.
+- Sales by day visualization.
+- Inventory insights.
+- Empty states for reports.
+- Reports skeleton loading state.
+- Reusable report calculations.
+- Reusable report query functions.
+
+### Dashboard
+
+Completed Dashboard functionality including:
+
+- Product count.
+- Total sales count.
+- Low stock count.
+- Total revenue.
+- Recent sales display.
+- Dashboard loading states.
+- Dashboard error states.
+- Retry functionality.
+- Receipt viewing.
+
+### Inventory
+
+Completed Inventory functionality including:
+
+- Add product.
+- Edit product.
+- Delete product.
+- Search products.
+- Product quantity tracking.
+- Low stock detection.
+- Out of stock detection.
+- Stock status indicators.
+- Loading state.
+- Error handling.
+- Retry functionality.
+- Save and delete loading states.
+
+### Point of Sale
+
+Completed POS functionality including:
+
+- Product picker.
+- Shopping cart.
+- Cart summary.
+- Cash payment handling.
+- Automatic change calculation.
+- Quick cash buttons.
+- Exact amount functionality.
+- Firestore transaction checkout.
+- Automatic inventory deduction.
+- Stock validation.
+- Receipt generation.
+- Receipt printing.
+
+### Sales History
+
+Completed Sales History functionality including:
+
+- Transaction history.
+- Sale records from Firestore.
+- Receipt viewing.
+- Reusable receipt mapping.
+- Receipt printing.
+- Sale item information.
+- Transaction totals.
+- Cash received.
+- Change calculation.
+
+### Authentication
+
+Completed authentication functionality including:
+
+- Google sign-in.
+- Firebase Authentication integration.
+- Protected application access.
+
+---
+
+## Technical Stack
+
+Tindahan AI currently uses:
+
+- Next.js 16
+- React 19
+- TypeScript
+- Firebase Authentication
+- Firebase Firestore
+- Tailwind CSS
+- Recharts
+- React Icons
+- Sonner notifications
+
+---
+
+## Development Philosophy
+
+Tindahan AI follows these principles:
+
+- Build features incrementally.
+- Keep the application compiling after each change.
+- Prefer modular architecture.
+- Keep UI components focused on presentation.
+- Move business logic into reusable utility modules.
+- Keep Firestore access separated from UI components.
+- Avoid unnecessary abstractions.
+- Prefer production-quality code.
+- Improve features without breaking existing functionality.
 # Tindahan AI Changelog
 
 ## Reports Module — Sales Trend Chart

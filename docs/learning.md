@@ -668,3 +668,61 @@ For the first time, the application transformed raw sales data into an interacti
 More importantly, this milestone validated that the architecture built over previous modules is working as intended. Because responsibilities are clearly separated, new analytics features can be introduced by modifying only the presentation layer.
 
 The project is no longer just a Point of Sale application—it is steadily evolving into a business intelligence platform capable of helping store owners understand, not just record, their business.
+
+# Learning Journal
+
+This document tracks the concepts, architectural decisions, and software engineering lessons learned while building Tindahan AI.
+
+---
+
+# Project
+
+Tindahan AI is a Point of Sale and inventory management system built using:
+
+- Next.js 16
+- React 19
+- TypeScript
+- Firebase Firestore
+- Firebase Authentication
+- Tailwind CSS
+- Recharts
+
+The project is being developed with a focus on learning production-style software architecture.
+
+---
+
+# Major Learning Principles
+
+## 1. Separation of Concerns
+
+One of the biggest lessons learned during development is that a component should not be responsible for everything.
+
+A large page containing:
+
+- UI
+- State
+- Firebase calls
+- Calculations
+- Form handling
+- Table rendering
+
+quickly becomes difficult to maintain.
+
+Instead, responsibilities should be separated.
+
+Example:
+
+```text
+InventoryPage
+│
+├── State management
+├── CRUD operations
+│
+├── ProductForm
+│   └── Form UI
+│
+├── ProductTable
+│   └── Product display UI
+│
+└── StockStatus
+    └── Inventory status UI
