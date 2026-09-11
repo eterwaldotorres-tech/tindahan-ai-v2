@@ -1,9 +1,6 @@
 # Changelog
-# Changelog
 
 All notable changes to Tindahan AI are documented in this file.
-
----
 
 ## [Unreleased]
 
@@ -39,8 +36,6 @@ All notable changes to Tindahan AI are documented in this file.
 
 ### Refactored
 
-#### Dashboard
-
 Dashboard responsibilities are now separated into:
 
 - `page.tsx` — state management and orchestration.
@@ -67,8 +62,6 @@ Inventory responsibilities are now separated into:
 - Preserved delete loading state after extracting ProductTable.
 - Improved text visibility and contrast across Inventory UI components.
 - Improved error recovery with retry buttons.
-
----
 
 ## Previous Features
 
@@ -161,8 +154,6 @@ Completed authentication functionality including:
 - Firebase Authentication integration.
 - Protected application access.
 
----
-
 ## Technical Stack
 
 Tindahan AI currently uses:
@@ -177,7 +168,6 @@ Tindahan AI currently uses:
 - React Icons
 - Sonner notifications
 
----
 
 ## Development Philosophy
 
@@ -216,7 +206,6 @@ SalesTrendChart
 
 The objective was to replace the temporary JSON output with a production-quality Recharts visualization while preserving the existing architecture.
 
----
 
 ## Added
 
@@ -228,7 +217,6 @@ Installed Recharts for analytics visualizations.
 npm install recharts
 ```
 
----
 
 ### SalesTrendChart
 
@@ -276,7 +264,6 @@ Applied to:
 
 This improves readability and aligns analytics with how store owners naturally interpret sales data.
 
----
 
 ### Chart Polish
 
@@ -290,7 +277,6 @@ Improved the visual quality of the chart by adding:
 
 These changes improved readability without affecting the reporting pipeline.
 
----
 
 ## Architecture
 
@@ -315,7 +301,6 @@ Responsibilities remain clearly separated:
 - UI rendering → SalesTrendChart
 - Page orchestration → ReportsPage
 
----
 
 ## Design System
 
@@ -333,7 +318,6 @@ Current standards:
 - clean KPI cards
 - modern analytics presentation
 
----
 
 ## Progress Made
 
@@ -351,7 +335,6 @@ Completed:
 
 The Reports page now contains Tindahan AI's first interactive analytics visualization.
 
----
 
 ## Next Steps
 
@@ -396,7 +379,6 @@ Planned improvements:
 - Additional domains (Refunds, Returns, Archived Sales, etc.) can reuse the receipt system by providing their own mapper to `ReceiptData`.
 # Changelog
 
-
 ## Session: Receipt Preview Architecture
 
 ### Added
@@ -418,24 +400,6 @@ Planned improvements:
   * Receipt data now uses the actual `saleId` and `createdAt` from the checkout result.
 
 ### Architecture Improvements
-
-Current checkout flow:
-
-```text
-Cart
-    ↓
-checkoutCart()
-    ↓
-CheckoutResult
-    ↓
-mapCheckoutToReceipt()
-    ↓
-ReceiptData
-    ↓
-ReceiptDialog
-    ↓
-Receipt
-```
 
 Responsibilities are now clearly separated:
 
@@ -513,7 +477,6 @@ Next milestone:
 - Dashboard alignment
 - Product refresh after updates
 
----
 
 ## v0.2.0
 
@@ -522,7 +485,6 @@ Next milestone:
 - Sidebar
 - Topbar
 
----
 
 ## v0.1.0
 
