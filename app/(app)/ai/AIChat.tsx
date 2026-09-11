@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
 import { auth } from "@/lib/firebase";
 import { AIMessage } from "./types";
 
@@ -8,6 +9,62 @@ export default function AIChat() {
     const [message, setMessage] = useState("");
     const [messages, setMessages] = useState<AIMessage[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingHistory, setIsLoadingHistory] = useState(true);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const loadHistory = async () => {
+            try {
+                const user = auth.currentUser;
+
+                if (!user) {
+                    return;
+                }
+
+                const idToken = await user.getIdToken();
+
+                const response = await fetch(
+                    "/api/ai/chat/history",
+                    {
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${idToken}`,
+                        },
+                    }
+                );
+
+                if (!response.ok) {
+                    throw new Error(
+                        "Unable to load chat history."
+                    );
+                }
+
+                const data = (await response.json()) as {
+                    messages?: AIMessage[];
+                };
+
+                if (isMounted) {
+                    setMessages(data.messages ?? []);
+                }
+            } catch (error) {
+                console.error(
+                    "Failed to load AI chat history:",
+                    error
+                );
+            } finally {
+                if (isMounted) {
+                    setIsLoadingHistory(false);
+                }
+            }
+        };
+
+        loadHistory();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
 
     const handleSubmit = async (
         event: React.FormEvent<HTMLFormElement>
@@ -23,6 +80,7 @@ export default function AIChat() {
         const user = auth.currentUser;
 
         if (!user) {
+            console.error("No authenticated Firebase user.");
             return;
         }
 
@@ -54,7 +112,24 @@ export default function AIChat() {
                 }),
             });
 
-            const data = await response.json();
+            const responseText = await response.text();
+
+            let data: { error?: string; message?: string };
+
+            try {
+                data = responseText
+                    ? JSON.parse(responseText)
+                    : {};
+            } catch {
+                console.error(
+                    "API returned invalid JSON:",
+                    responseText
+                );
+
+                throw new Error(
+                    `Server returned an invalid response (${response.status}).`
+                );
+            }
 
             if (!response.ok) {
                 throw new Error(
@@ -62,9 +137,38 @@ export default function AIChat() {
                 );
             }
 
-            console.log("AI response:", data);
+            if (!data.message) {
+                throw new Error(
+                    "The AI returned an empty response."
+                );
+            }
+
+            const aiMessage: AIMessage = {
+                id: Date.now() + 1,
+                role: "assistant",
+                content: data.message,
+            };
+
+            setMessages((currentMessages) => [
+                ...currentMessages,
+                aiMessage,
+            ]);
         } catch (error) {
             console.error("AI request failed:", error);
+
+            const errorMessage: AIMessage = {
+                id: Date.now() + 1,
+                role: "assistant",
+                content:
+                    error instanceof Error
+                        ? error.message
+                        : "Unable to get a response from the AI.",
+            };
+
+            setMessages((currentMessages) => [
+                ...currentMessages,
+                errorMessage,
+            ]);
         } finally {
             setIsLoading(false);
         }
@@ -73,7 +177,13 @@ export default function AIChat() {
     return (
         <div className="flex h-[calc(100vh-8rem)] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
             <div className="flex-1 overflow-y-auto p-6">
-                {messages.length === 0 ? (
+                {isLoadingHistory ? (
+                    <div className="flex min-h-full items-center justify-center">
+                        <p className="text-sm text-gray-500">
+                            Loading conversation...
+                        </p>
+                    </div>
+                ) : messages.length === 0 ? (
                     <div className="flex min-h-full items-center justify-center">
                         <div className="max-w-md text-center">
                             <h2 className="text-lg font-semibold text-gray-900">
@@ -122,13 +232,17 @@ export default function AIChat() {
                             setMessage(event.target.value)
                         }
                         placeholder="Ask about your store..."
-                        disabled={isLoading}
+                        disabled={
+                            isLoading || isLoadingHistory
+                        }
                         className="flex-1 rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-gray-100"
                     />
 
                     <button
                         type="submit"
-                        disabled={isLoading}
+                        disabled={
+                            isLoading || isLoadingHistory
+                        }
                         className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-medium text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                         {isLoading ? "Sending..." : "Send"}
